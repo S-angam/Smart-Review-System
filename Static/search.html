@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search File Report</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body,
+      html {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #f8f9fa;
+      }
+      .container {
+        margin-top: 20px;
+        width: 80%;
+      }
+      #reportResult {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar with Search Form -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light w-100">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">File Report</a>
+        <form class="d-flex" id="searchForm" onsubmit="getReport(event)">
+          <input
+            class="form-control me-2"
+            type="number"
+            placeholder="Enter File ID"
+            aria-label="File ID"
+            id="fileIdInput"
+            required
+          />
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </nav>
+
+    <!-- Report Display Section -->
+    <div class="container">
+      <div id="reportResult" class="alert alert-info" style="display: none">
+        <!-- Report content will be dynamically inserted here -->
+      </div>
+    </div>
+
+    <script>
+      // Function to fetch the report data and display it
+      async function getReport(event) {
+        event.preventDefault(); // Prevent form submission reload
+        const fileId = document.getElementById("fileIdInput").value;
+        const reportResult = document.getElementById("reportResult");
+
+        try {
+          // Fetch report data from /getReport
+          const response = await fetch("/getReport", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ file_id: fileId }),
+          });
+
+          // Handle response
+          if (response.ok) {
+            const data = await response.json();
+            reportResult.style.display = "block";
+            reportResult.classList.remove("alert-info", "alert-danger");
+            reportResult.classList.add("alert-success");
+            reportResult.innerHTML = `
+                        <h5>Report for File ID: ${fileId}</h5>
+                        <p>${data.report}</p>
+                    `;
+          } else {
+            reportResult.style.display = "block";
+            reportResult.classList.remove("alert-info", "alert-success");
+            reportResult.classList.add("alert-danger");
+            reportResult.innerHTML = "File ID not found or error occurred.";
+          }
+        } catch (error) {
+          reportResult.style.display = "block";
+          reportResult.classList.remove("alert-info", "alert-success");
+          reportResult.classList.add("alert-danger");
+          reportResult.innerHTML =
+            "An error occurred while fetching the report.";
+        }
+      }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+numpy
+pandas
+nltk
+uvicorn
+uvicorn[standard]
+fastapi[standard]
+PyPDF2
